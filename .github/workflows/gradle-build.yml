@@ -1,0 +1,71 @@
+name: Build
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java_version: [ 11, 17 ]
+    steps:
+      - uses: actions/checkout@main
+      - name: Set up JDK ${{ matrix.java_version }}
+        uses: actions/setup-java@main
+        with:
+          java-version: ${{ matrix.java_version }}
+          distribution: 'adopt'
+          cache: 'gradle'
+
+      - name: Build with Gradle
+        run: gradle build
+
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java_version: [ 11, 17 ]
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+
+      - name: Set up JDK ${{ matrix.java_version }}
+        uses: actions/setup-java@main
+        with:
+          java-version: ${{ matrix.java_version }}
+          distribution: 'adopt'
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@main
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@main
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@main
+
+  dependency-review:
+    if: ${{ github.event_name == 'pull_request' }}
+    permissions:
+      contents: read
+    name: Dependency Review Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@main
+      - name: 'Dependency Review'
+        uses: actions/dependency-review-action@main
+
+  validation:
+    name: Validate Gradle Wrapper
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: gradle/wrapper-validation-action@main
