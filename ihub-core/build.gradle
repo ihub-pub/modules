@@ -1,0 +1,40 @@
+/*
+ * Copyright (c) 2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+apply {
+    plugin 'tech.yanand.maven-central-publish'
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Local"
+            url = layout.buildDirectory.dir("repos/bundles")
+        }
+    }
+}
+
+mavenCentral {
+    repoDir = layout.buildDirectory.dir('repos/bundles')
+    // 从 Sonatype 官方获取的 Publisher API 调用的 token，应为 Base64 编码后的 username:password
+    authToken = '<your token>'
+    // 上传是否应该自动发布。如果您希望手动执行此操作，请使用 'USER_MANAGED'。
+    // 该属性是可选的，默认为 'AUTOMATIC'。
+    publishingType = 'USER_MANAGED'
+    // 当发布类型为 'AUTOMATIC' 时，状态API获取 'PUBLISHING' 或 'PUBLISHED' 状态的最大等待时间
+    // 或者当发布类型为 'USER_MANAGED' 时，获取 'VALIDATED' 状态。
+    // 该属性是可选的，默认为60秒。
+    maxWait = 60
+}

@@ -6,6 +6,7 @@ plugins {
     alias(ihub.plugins.test) apply false
     alias(ihub.plugins.verification) apply false
     alias(ihub.plugins.publish) apply false
+    id("tech.yanand.maven-central-publish") version "1.1.1"
 }
 
 subprojects {
