@@ -1,3 +1,3 @@
 plugins {
-    id("pub.ihub.plugin.ihub-settings") version "1.8.3"
+    id("pub.ihub.plugin.ihub-settings") version "1.9.0"
 }
