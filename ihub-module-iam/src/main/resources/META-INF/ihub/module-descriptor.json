@@ -1,0 +1,135 @@
+{
+  "$schema": "https://ihub.pub/schemas/module-descriptor/v1",
+  "id": "iam-user",
+  "name": "用户管理模块",
+  "name_en": "User Management Module",
+  "version": "0.1.0",
+  "domain": "iam",
+  "description": "提供用户账号生命周期管理：注册、认证、档案、状态变更",
+  "ai_context": "## 集成模式\n引入 `ihub-module-iam` 依赖，添加 `@EnableIHubUserModule` 注解或依赖自动配置。\n\n## API 清单\n- `POST /api/users` — 创建用户\n- `GET /api/users/{id}` — 查询用户详情\n- `PUT /api/users/{id}` — 更新用户信息\n- `DELETE /api/users/{id}` — 注销用户\n- `POST /api/users/{id}/roles` — 分配角色\n- `GET /api/users?keyword=&roleId=&page=&size=` — 分页查询\n\n## 配置要点\n- `ihub.module.user.password-encoder`: 密码加密器（默认 BCrypt）\n- `ihub.module.user.email-verification`: 是否开启邮箱验证（默认 false）\n- `ihub.module.user.default-role`: 新用户默认角色 ID\n\n## 依赖关系\n- 依赖 `iam-role` 模块进行角色分配\n- 依赖 `data-orm-mybatis-plus`（libs catalog）进行数据持久化\n- 依赖 `security-authn-spring`（libs catalog）进行认证集成\n\n## 约束与限制\n- 用户名全局唯一\n- 密码最低 8 位，含大小写和数字\n- 删除用户前需先解除所有角色绑定\n\n## 常见陷阱\n- 未配置 `default-role` 导致新用户无任何权限\n- 忘记开启邮箱验证导致测试账号泛滥\n- 用户 ID 与租户 ID 混淆（多租户场景）",
+  "capabilities": [
+    {
+      "id": "user.create",
+      "name": "创建用户",
+      "type": "api",
+      "description": "创建新用户账号，支持设置初始角色",
+      "input_schema": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": { "type": "string", "minLength": 3, "maxLength": 32 },
+          "password": { "type": "string", "minLength": 8 },
+          "email": { "type": "string", "format": "email" },
+          "roles": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "username": { "type": "string" },
+          "status": { "type": "string", "enum": ["active", "pending"] }
+        }
+      }
+    },
+    {
+      "id": "user.query",
+      "name": "查询用户",
+      "type": "api",
+      "description": "按条件分页查询用户列表",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "keyword": { "type": "string" },
+          "roleId": { "type": "string" },
+          "page": { "type": "integer", "minimum": 0 },
+          "size": { "type": "integer", "minimum": 1, "maximum": 100 }
+        }
+      }
+    },
+    {
+      "id": "user.status-changed",
+      "name": "用户状态变更事件",
+      "type": "event",
+      "description": "用户状态发生变化时发布的领域事件（激活、禁用、注销）",
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "oldStatus": { "type": "string" },
+          "newStatus": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  ],
+  "dependencies": [
+    {
+      "moduleId": "iam-role",
+      "required": false,
+      "reason": "角色分配功能需要角色模块；若不需要 RBAC 可不引入"
+    }
+  ],
+  "maven": {
+    "group": "pub.ihub.module",
+    "artifact": "ihub-module-iam"
+  },
+  "gradle_ref": "ihub-module-iam",
+  "config_prefix": "ihub.module.user",
+  "tags": ["iam", "user", "authentication", "account"],
+  "status": "planned",
+  "mcp_tools": [
+    {
+      "name": "createUser",
+      "description": "创建用户账号。需要提供用户名和密码，可选邮箱和初始角色列表。返回新建用户的 ID 和初始状态",
+      "input_schema": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" },
+          "email": { "type": "string" },
+          "roles": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "status": { "type": "string" }
+        }
+      }
+    },
+    {
+      "name": "queryUsers",
+      "description": "按关键字或角色分页查询用户列表。返回符合条件的用户摘要列表",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "keyword": { "type": "string" },
+          "roleId": { "type": "string" },
+          "page": { "type": "integer" },
+          "size": { "type": "integer" }
+        }
+      }
+    },
+    {
+      "name": "assignRole",
+      "description": "为指定用户分配一个或多个角色。角色立即生效",
+      "input_schema": {
+        "type": "object",
+        "required": ["userId", "roleIds"],
+        "properties": {
+          "userId": { "type": "string" },
+          "roleIds": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" }
+        }
+      }
+    }
+  ]
+}

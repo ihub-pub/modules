@@ -34,7 +34,40 @@
     </a>
 </p>
 
-通用业务模块组件库
+## IHub 业务蓝图层（L2 Capability Board）
+
+IHub 三层架构中的 **业务蓝图层**，提供即插即用的通用业务模块，每个模块携带 AI 可编排的结构化描述符。
+
+### 🧩 模块描述符规范
+
+每个业务模块在 `META-INF/ihub/module-descriptor.json` 提供结构化元数据，AI 工具可通过 MCP Server 发现并编排这些模块：
+
+```json
+{
+  "id": "iam-user",
+  "domain": "iam",
+  "capabilities": [...],    // API、事件、定时任务
+  "mcp_tools": [...]        // AI 可直接调用的操作
+}
+```
+
+JSON Schema: [`schema/module-descriptor-v1.json`](schema/module-descriptor-v1.json)
+
+### 📦 核心模块
+
+| 模块 | 状态 | 描述 |
+|------|------|------|
+| `ihub-module-core` | 实验性 | 模块基础设施：描述符模型、注册表、Jackson 序列化 |
+| `ihub-module-iam` | 实验性 | IAM 模块：用户/角色/权限管理（内存实现 + Spring Boot 自动配置） |
+
+### 🤖 AI 编排能力
+
+通过 `agents/mcp-server` 的 `ModuleTools`，AI 工具可：
+- `listModules()` — 列出所有可用业务模块
+- `getModule(moduleId)` — 获取模块详细描述符
+- `getModuleTools(moduleId)` — 获取模块的 MCP 工具列表
+
+> 详细设计：[P2 MCP 编排规范](https://github.com/ihub-pub/ihub/blob/main/docs/strategy/2026-05-04-ihub-modules-p2-design.md)
 
 ## 🧭 开源贡献指南
 
