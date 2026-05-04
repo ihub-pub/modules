@@ -1,0 +1,20 @@
+{
+  "id": "test-module",
+  "name": "测试模块",
+  "name_en": "Test Module",
+  "version": "0.1.0",
+  "domain": "test",
+  "description": "用于单元测试的模块描述符",
+  "ai_context": "测试专用，无需集成",
+  "capabilities": [],
+  "dependencies": [],
+  "maven": {
+    "group": "pub.ihub.module",
+    "artifact": "ihub-module-test"
+  },
+  "gradle_ref": "ihub-module-test",
+  "config_prefix": "ihub.module.test",
+  "tags": ["test"],
+  "status": "experimental",
+  "mcp_tools": []
+}

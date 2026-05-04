@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ihub.pub/schemas/module-descriptor/v1",
+  "title": "IHub Module Descriptor",
+  "description": "IHub 业务模块描述符 v1 规范。每个模块在 META-INF/ihub/module-descriptor.json 提供此文件",
+  "type": "object",
+  "required": ["id", "name", "domain", "description", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "模块唯一标识，建议格式：{domain}-{name}，如 iam-user",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "name": {
+      "type": "string",
+      "description": "模块中文名称"
+    },
+    "name_en": {
+      "type": "string",
+      "description": "模块英文名称"
+    },
+    "version": {
+      "type": "string",
+      "description": "模块版本号"
+    },
+    "domain": {
+      "type": "string",
+      "description": "所属业务领域，如 iam / organization / content"
+    },
+    "description": {
+      "type": "string",
+      "description": "一句话功能描述"
+    },
+    "ai_context": {
+      "type": "string",
+      "description": "面向 LLM 的详细上下文（Markdown 格式）：集成方式、API 清单、配置要点、常见陷阱"
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "模块提供的能力列表",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "type", "description"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["api", "event", "schedule", "mcp_tool"]
+          },
+          "description": { "type": "string" },
+          "input_schema": { "type": "object" },
+          "output_schema": { "type": "object" }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "模块间依赖声明",
+      "items": {
+        "type": "object",
+        "required": ["moduleId", "required"],
+        "properties": {
+          "moduleId": { "type": "string" },
+          "required": { "type": "boolean" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "maven": {
+      "type": "object",
+      "description": "Maven 坐标",
+      "properties": {
+        "group": { "type": "string" },
+        "artifact": { "type": "string" }
+      }
+    },
+    "gradle_ref": {
+      "type": "string",
+      "description": "libs.versions.toml 别名"
+    },
+    "config_prefix": {
+      "type": "string",
+      "description": "Spring 配置前缀，如 ihub.module.user"
+    },
+    "starter_class": {
+      "type": "string",
+      "description": "Spring Boot 自动配置类全名"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["planned", "experimental", "stable", "deprecated"],
+      "description": "模块状态"
+    },
+    "mcp_tools": {
+      "type": "array",
+      "description": "AI 可通过 MCP 调用的工具列表",
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "工具名称（全局唯一，camelCase）"
+          },
+          "description": {
+            "type": "string",
+            "description": "AI 理解工具用途的描述（清晰准确，影响 AI 调用准确率）"
+          },
+          "input_schema": { "type": "object" },
+          "output_schema": { "type": "object" }
+        }
+      }
+    }
+  }
+}
