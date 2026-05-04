@@ -17,4 +17,12 @@ description = "IHub IAM 模块（用户/角色/权限）"
 
 dependencies {
     implementation(project(":ihub-module-core"))
+    compileOnly("org.springframework.boot:spring-boot-autoconfigure")
+    compileOnly("com.fasterxml.jackson.core:jackson-databind")
+
+    testImplementation("org.springframework.boot:spring-boot-autoconfigure")
+    testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    testImplementation("org.springframework.boot:spring-boot-test")
+    testImplementation("org.springframework:spring-test")
+    testImplementation("org.assertj:assertj-core")
 }
