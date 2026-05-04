@@ -58,7 +58,7 @@ JSON Schema: [`schema/module-descriptor-v1.json`](schema/module-descriptor-v1.js
 | 模块 | 状态 | 描述 |
 |------|------|------|
 | `ihub-module-core` | 实验性 | 模块基础设施：描述符模型、注册表、Jackson 序列化 |
-| `ihub-module-iam` | 规划中 | IAM 模块：用户/角色/权限管理 |
+| `ihub-module-iam` | 实验性 | IAM 模块：用户/角色/权限管理（内存实现 + Spring Boot 自动配置） |
 
 ### 🤖 AI 编排能力
 
