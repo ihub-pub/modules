@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "domain": "iam",
   "description": "提供用户账号生命周期管理：注册、认证、档案、状态变更",
-  "ai_context": "## 集成模式\n引入 `ihub-module-iam` 依赖，添加 `@EnableIHubUserModule` 注解或依赖自动配置。\n\n## API 清单\n- `POST /api/users` — 创建用户\n- `GET /api/users/{id}` — 查询用户详情\n- `PUT /api/users/{id}` — 更新用户信息\n- `DELETE /api/users/{id}` — 注销用户\n- `POST /api/users/{id}/roles` — 分配角色\n- `GET /api/users?keyword=&roleId=&page=&size=` — 分页查询\n\n## 配置要点\n- `ihub.module.user.password-encoder`: 密码加密器（默认 BCrypt）\n- `ihub.module.user.email-verification`: 是否开启邮箱验证（默认 false）\n- `ihub.module.user.default-role`: 新用户默认角色 ID\n\n## 依赖关系\n- 依赖 `iam-role` 模块进行角色分配\n- 依赖 `data-orm-mybatis-plus`（libs catalog）进行数据持久化\n- 依赖 `security-authn-spring`（libs catalog）进行认证集成\n\n## 约束与限制\n- 用户名全局唯一\n- 密码最低 8 位，含大小写和数字\n- 删除用户前需先解除所有角色绑定\n\n## 常见陷阱\n- 未配置 `default-role` 导致新用户无任何权限\n- 忘记开启邮箱验证导致测试账号泛滥\n- 用户 ID 与租户 ID 混淆（多租户场景）",
+  "ai_context": "## 集成模式\n引入 `ihub-module-iam` 依赖即自动配置：`PasswordEncoder`（默认 BCrypt，自定义 Bean 可覆盖）、内存版 `UserService`（自定义 Bean 可替换为持久化实现）、Servlet Web 应用中的 `UserController`（`/api/users`）。\n\n## API 清单\n- `POST /api/users` — 创建用户（201，Location 头；用户名重复 409，参数不合法 400 附字段级错误）\n- `GET /api/users/{id}` — 查询用户详情（404 不存在）\n- `PUT /api/users/{id}` — 更新用户档案（邮箱）\n- `DELETE /api/users/{id}` — 注销用户（软删除，状态置 DELETED）\n- `POST /api/users/{id}/roles` — 追加角色\n- `GET /api/users?keyword=&roleId=&page=&size=` — 分页查询（size 1-100，默认 20；keyword 匹配用户名/邮箱）\n\n## 配置要点\n- `ihub.module.user.default-role`: 新用户默认角色 ID（创建时未指定角色则追加）\n- 密码加密器通过自定义 `PasswordEncoder` Bean 覆盖（默认 BCrypt）\n- 认证校验：`UserService.authenticate(username, rawPassword)`（BCrypt 比对）\n\n## 依赖关系\n- 可选依赖 `iam-role` 模块进行角色分配（不引入 RBAC 亦可独立使用）\n\n## 约束与限制\n- 用户名全局唯一，3-32 位字母/数字/下划线/中划线，注销后不释放\n- 密码 8-72 位（BCrypt 上限），须包含大小写字母和数字；哈希存储，域对象与 API 响应均不含密码\n- 默认存储为内存实现，重启数据丢失，生产环境须以持久化 `UserService` Bean 覆盖\n\n## 常见陷阱\n- 未配置 `default-role` 导致新用户无任何权限\n- 覆盖 `UserService` Bean 时须同时接收 `PasswordEncoder` 参数以保持密码哈希一致\n- 删除为软删除（状态 DELETED），用户名仍占用，不能重建同名用户",
   "capabilities": [
     {
       "id": "user.create",
@@ -77,7 +77,7 @@
   "gradle_ref": "ihub-module-iam",
   "config_prefix": "ihub.module.user",
   "tags": ["iam", "user", "authentication", "account"],
-  "status": "planned",
+  "status": "experimental",
   "mcp_tools": [
     {
       "name": "createUser",

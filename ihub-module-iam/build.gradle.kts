@@ -17,12 +17,21 @@ description = "IHub IAM 模块（用户/角色/权限）"
 
 dependencies {
     implementation(project(":ihub-module-core"))
+    api("org.springframework.security:spring-security-crypto")
     compileOnly("org.springframework.boot:spring-boot-autoconfigure")
+    compileOnly("org.springframework:spring-web")
+    compileOnly("jakarta.validation:jakarta.validation-api")
     compileOnly("com.fasterxml.jackson.core:jackson-databind")
 
     testImplementation("org.springframework.boot:spring-boot-autoconfigure")
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
     testImplementation("org.springframework.boot:spring-boot-test")
     testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework:spring-webmvc")
+    testImplementation("org.hibernate.validator:hibernate-validator")
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    testImplementation("com.jayway.jsonpath:json-path")
+    testImplementation("org.hamcrest:hamcrest")
     testImplementation("org.assertj:assertj-core")
 }
