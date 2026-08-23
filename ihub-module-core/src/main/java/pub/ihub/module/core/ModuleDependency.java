@@ -15,6 +15,8 @@
  */
 package pub.ihub.module.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * 模块间依赖声明。
  *
@@ -24,6 +26,7 @@ package pub.ihub.module.core;
  * @author IHub
  * @since 0.1.0
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record ModuleDependency(
         String moduleId,
         boolean required,
