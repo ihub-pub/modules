@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # main
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - name: Setup Gradle to generate and submit dependency graphs
         uses: gradle/gradle-build-action@ac2d340dc04d9e1113182899e983b5400c17cda1 # v3.5.0
